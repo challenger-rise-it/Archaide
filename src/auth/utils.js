@@ -1,30 +1,47 @@
 import useJwt from '@src/@core/auth/jwt/useJwt'
 
-/**
- * Return if user is logged in
- * This is completely up to you and how you want to store the token in your frontend application
- * e.g. If you are using cookies to store the application please update this function
+/** 
+ * Constants for localStorage keys
  */
-// eslint-disable-next-line arrow-body-style
-export const isUserLoggedIn = () => {
-  return (
-    localStorage.getItem('userData') &&
-    localStorage.getItem(useJwt.jwtConfig.storageTokenKeyName)
-  )
-}
-
-export const getUserData = () => JSON.parse(localStorage.getItem('userData'))
+const LOCAL_STORAGE_USER_DATA_KEY = 'userData';
+const LOCAL_STORAGE_TOKEN_KEY = useJwt.jwtConfig.storageTokenKeyName;
 
 /**
- * This function is used for demo purpose route navigation
- * In real app you won't need this function because your app will navigate to same route for each users regardless of ability
- * Please note role field is just for showing purpose it's not used by anything in frontend
- * We are checking role just for ease
- * NOTE: If you have different pages to navigate based on user ability then this function can be useful. However, you need to update it.
- * @param {String} userRole Role of user
+ * Utility function to check if the user is logged in
+ * Checks for the presence of user data and token in localStorage
+ * 
+ * @returns {Boolean} - Whether the user is logged in
+ */
+export const isUserLoggedIn = () => {
+  const userData = localStorage.getItem(LOCAL_STORAGE_USER_DATA_KEY);
+  const token = localStorage.getItem(LOCAL_STORAGE_TOKEN_KEY);
+  return userData && token;
+};
+
+/**
+ * Utility function to retrieve user data from localStorage
+ * 
+ * @returns {Object|null} - Parsed user data from localStorage or null if not found
+ */
+export const getUserData = () => {
+  const userData = localStorage.getItem(LOCAL_STORAGE_USER_DATA_KEY);
+  return userData ? JSON.parse(userData) : null;
+};
+
+/**
+ * Function to return the appropriate home route based on the user's role
+ * This could be extended to accommodate more roles or complex routing logic.
+ *
+ * @param {String} userRole - The role of the user (e.g., 'admin', 'client')
+ * @returns {Object|String} - The route name or path for the user based on their role
  */
 export const getHomeRouteForLoggedInUser = (userRole) => {
-  if (userRole === 'admin') return '/'
-  if (userRole === 'client') return { name: 'access-control' }
-  return { name: 'auth-login' }
-}
+  switch (userRole) {
+    case 'admin':
+      return '/';
+    case 'client':
+      return { name: 'access-control' };
+    default:
+      return { name: 'auth-login' };
+  }
+};
